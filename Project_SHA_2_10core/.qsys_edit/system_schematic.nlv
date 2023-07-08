@@ -1,0 +1,34 @@
+# # File gsaved with Nlview version 6.3.8  2013-12-19 bk=1.2992 VDI=34 GEI=35
+# 
+preplace inst system.SHA_6 -pg 1 -lvl 3 -y 730
+preplace inst system.nios2_gen2_0.cpu -pg 1
+preplace inst system.SHA_7 -pg 1 -lvl 3 -y 830
+preplace inst system.SHA_8 -pg 1 -lvl 3 -y 1030
+preplace inst system.nios2_gen2_0.clock_bridge -pg 1
+preplace inst system.jtag_uart_0 -pg 1 -lvl 3 -y 1390
+preplace inst system.SHA_9 -pg 1 -lvl 3 -y 1130
+preplace inst system.pll_0 -pg 1 -lvl 2 -y 1470
+preplace inst system.nios2_gen2_0.reset_bridge -pg 1
+preplace inst system.sdram -pg 1 -lvl 3 -y 30
+preplace inst system.onchip_memory2_0 -pg 1 -lvl 3 -y 1310
+preplace inst system.nios2_gen2_0 -pg 1 -lvl 2 -y 1280
+preplace inst system.onchip_memory2_1 -pg 1 -lvl 3 -y 1230
+preplace inst system.SHA_0 -pg 1 -lvl 3 -y 130
+preplace inst system.SHA_1 -pg 1 -lvl 3 -y 230
+preplace inst system.SHA_2 -pg 1 -lvl 3 -y 330
+preplace inst system.SHA_3 -pg 1 -lvl 3 -y 430
+preplace inst system.SHA_4 -pg 1 -lvl 3 -y 530
+preplace inst system -pg 1 -lvl 1 -y 40 -regy -20
+preplace inst system.system_clk -pg 1 -lvl 1 -y 1300
+preplace inst system.SHA_5 -pg 1 -lvl 3 -y 630
+preplace inst system.SHA_10 -pg 1 -lvl 3 -y 930
+preplace netloc FAN_OUT<net_container>system</net_container>(SLAVE)SHA_7.clock,(SLAVE)SHA_10.clock,(SLAVE)SHA_4.clock,(SLAVE)SHA_5.clock,(SLAVE)SHA_1.clock,(SLAVE)SHA_0.clock,(SLAVE)SHA_9.clock,(MASTER)pll_0.outclk0,(SLAVE)SHA_8.clock,(SLAVE)SHA_3.clock,(SLAVE)SHA_2.clock,(SLAVE)SHA_6.clock) 1 2 1 770
+preplace netloc FAN_OUT<net_container>system</net_container>(SLAVE)SHA_3.reset,(SLAVE)jtag_uart_0.reset,(SLAVE)SHA_4.reset,(SLAVE)onchip_memory2_1.reset1,(SLAVE)sdram.reset,(SLAVE)pll_0.reset,(SLAVE)SHA_9.reset,(SLAVE)SHA_0.reset,(SLAVE)nios2_gen2_0.reset,(SLAVE)SHA_7.reset,(SLAVE)SHA_8.reset,(SLAVE)SHA_1.reset,(SLAVE)SHA_6.reset,(SLAVE)SHA_5.reset,(SLAVE)onchip_memory2_0.reset1,(MASTER)system_clk.clk_reset,(SLAVE)SHA_10.reset,(SLAVE)SHA_2.reset) 1 1 2 310 1220 750
+preplace netloc EXPORT<net_container>system</net_container>(SLAVE)system.sys_clk,(SLAVE)system_clk.clk_in) 1 0 1 NJ
+preplace netloc EXPORT<net_container>system</net_container>(SLAVE)system.sdram_wire,(SLAVE)sdram.wire) 1 0 3 NJ 100 NJ 100 NJ
+preplace netloc FAN_OUT<net_container>system</net_container>(SLAVE)SHA_10.interrupt_sender,(SLAVE)jtag_uart_0.irq,(MASTER)nios2_gen2_0.irq,(SLAVE)SHA_6.interrupt_sender,(SLAVE)SHA_1.interrupt_sender,(SLAVE)SHA_0.interrupt_sender,(SLAVE)SHA_5.interrupt_sender,(SLAVE)SHA_3.interrupt_sender,(SLAVE)SHA_4.interrupt_sender,(SLAVE)SHA_8.interrupt_sender,(SLAVE)SHA_2.interrupt_sender,(SLAVE)SHA_7.interrupt_sender,(SLAVE)SHA_9.interrupt_sender) 1 2 1 690
+preplace netloc FAN_OUT<net_container>system</net_container>(SLAVE)jtag_uart_0.clk,(MASTER)system_clk.clk,(SLAVE)onchip_memory2_0.clk1,(SLAVE)onchip_memory2_1.clk1,(SLAVE)nios2_gen2_0.clk,(SLAVE)pll_0.refclk,(SLAVE)sdram.clk) 1 1 2 290 1200 730
+preplace netloc EXPORT<net_container>system</net_container>(SLAVE)system.reset,(SLAVE)system_clk.clk_in_reset) 1 0 1 NJ
+preplace netloc INTERCONNECT<net_container>system</net_container>(SLAVE)SHA_9.avalon_slave_0,(MASTER)nios2_gen2_0.instruction_master,(MASTER)nios2_gen2_0.data_master,(SLAVE)SHA_7.avalon_slave_0,(SLAVE)SHA_3.avalon_slave_0,(SLAVE)onchip_memory2_1.s1,(SLAVE)SHA_2.avalon_slave_0,(SLAVE)SHA_8.avalon_slave_0,(SLAVE)SHA_5.avalon_slave_0,(SLAVE)jtag_uart_0.avalon_jtag_slave,(SLAVE)SHA_1.avalon_slave_0,(SLAVE)SHA_0.avalon_slave_0,(SLAVE)SHA_6.avalon_slave_0,(SLAVE)SHA_10.avalon_slave_0,(SLAVE)SHA_4.avalon_slave_0,(SLAVE)sdram.s1,(SLAVE)nios2_gen2_0.debug_mem_slave,(SLAVE)onchip_memory2_0.s1) 1 1 2 330 1240 710
+levelinfo -pg 1 0 80 970
+levelinfo -hier system 90 120 450 820 960

@@ -1,0 +1,66 @@
+
+#include "sys/alt_stdio.h"
+#include "system.h"
+#include "sys/alt_irq.h"
+#include "SHA.h"
+
+volatile alt_u32 *memory_ptr = (alt_u32*) ONCHIP_MEMORY2_1_BASE;
+
+volatile alt_u32 index = 0;
+unsigned int count2 = 0x0;
+unsigned char flag = 0;
+
+void SHA_0_IRQ_Handler(void* isr_context) {
+	count2++;
+	//clear interrupt
+	write_clr_irq(SHA_0_BASE);
+	/*--------init SHA core--------*/
+	SHA_Init(SHA_0_BASE, ONCHIP_MEMORY2_1_BASE,
+		CTRL_NEXT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+}
+
+
+int main() {
+
+	unsigned int block_header[80] = {0x00, 0xa0, 0x11, 0x2e, 0x53, 0x5d, 0x51, 0x23, 0x62, 0xf8, 0x06, 0x87, 0x51, 0x12, 0x04, 0xab, 0xed, 0x45, 0xae, 0x64, 0xcc, 0xa1, 0xa0, 0x5e, 0x82, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x93, 0x74, 0x13, 0xff, 0x6c, 0xdb, 0x14, 0xf4, 0x89, 0x33, 0xdb, 0xf2, 0x3e, 0xbb, 0xe3, 0x75, 0xde, 0x11, 0x92, 0x14, 0x34, 0x7d, 0x8a, 0x36, 0x8e, 0xac, 0x95, 0x4f, 0x94, 0xa1, 0x14, 0x1e, 0x85, 0xd8, 0x2e, 0x64, 0x3e, 0x02, 0x06, 0x17, 0x94, 0x48, 0xa8, 0x02};
+	int length = 0x0;
+	int NumberOfBlock = 0x0;
+	unsigned int block[16] = { 0x0 };
+	unsigned int digest[8] = { 0x0 };
+
+	alt_putstr("Hello from Nios II!\n");
+	/*--------register irq with handeler--------*/
+	alt_ic_isr_register(SHA_0_IRQ_INTERRUPT_CONTROLLER_ID, SHA_0_IRQ,
+			SHA_0_IRQ_Handler, (void*) 0, (void*) 0);
+   /*--------padding--------*/
+	NumberOfBlock = Padding_Mem(ONCHIP_MEMORY2_1_BASE, block_header, 0x50);
+
+   /*show block*/
+	for (index = 0; index < 3 * 16; index++) {
+		if ((index % SHA_BLOCK_SIZE) == 0)
+			printf("\n");
+		printf("%.4x", *(memory_ptr + index));
+	}
+
+	printf("\n");
+    /*--------init SHA core--------*/
+	SHA_Init(SHA_0_BASE, ONCHIP_MEMORY2_1_BASE,
+	CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+
+	printf("control = %.4x\n", read_control(SHA_2_BASE));
+
+	while (1) {
+		if (count2 == 0x2) {
+			printf("flag = %4x\n", flag);
+			read_digest(SHA_0_BASE, ONCHIP_MEMORY2_1_BASE);
+			printf("Hash digest = 0x");
+			for (index = 0; index < 8; index++) {
+				printf("%08x", *(memory_ptr + index));
+			}
+			printf("\n");
+			flag = flag & 0b11111110;
+		}
+	}
+
+	return 0;
+}

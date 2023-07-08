@@ -1,0 +1,276 @@
+//
+//#include "sys/alt_stdio.h"
+//#include "system.h"
+//#include "sys/alt_irq.h"
+//#include "SHA.h"
+//
+//volatile alt_u32 *memory_ptr = (alt_u32*) ONCHIP_MEMORY2_1_BASE;
+//
+//volatile alt_u32 index = 0;
+//unsigned int i = 0;
+//unsigned int count0 = 0x0;
+//unsigned int count1 = 0x0;
+//unsigned int count2 = 0x0;
+//unsigned int count3 = 0x0;
+//unsigned int count4 = 0x0;
+//unsigned int flag0 = 0x0;
+//unsigned int flag1 = 0x0;
+//unsigned int flag2 = 0x0;
+//unsigned int flag3 = 0x0;
+//unsigned int flag4 = 0x0;
+//
+//void SHA_0_IRQ_Handler(void* isr_context) {
+//	printf("interrupt _SHA0, COUNT: %x", count0);
+//	if(count0 == 0x2)
+//	{
+//	flag0 = flag0 | 0x1;
+//	}else{
+//		count0++;
+//	}
+//	//clear interrupt
+//	write_clr_irq(SHA_0_BASE);
+//}
+//
+//void SHA_1_IRQ_Handler(void* isr_context) {
+//	printf("interrupt _SHA1, COUNT: %x", count1);
+//	if(count1 == 0x2)
+//	{
+//	flag1 = flag1 | 0x1;
+//	}else{
+//		count1++;
+//	}
+//	//clear interrupt
+//	write_clr_irq(SHA_1_BASE);
+//}
+//
+//void SHA_2_IRQ_Handler(void* isr_context) {
+//	if(count2 == 0x2)
+//	{
+//	flag2 = flag2 | 0x1;
+//	}else{
+//		count2++;
+//	}
+//	//clear interrupt
+//	write_clr_irq(SHA_2_BASE);
+//}
+//
+//void SHA_3_IRQ_Handler(void* isr_context) {
+//	if(count3 == 0x2)
+//	{
+//	flag3 = flag3 | 0x1;
+//	}else{
+//		count3++;
+//	}
+//	//clear interrupt
+//	write_clr_irq(SHA_3_BASE);
+//}
+//
+//void SHA_4_IRQ_Handler(void* isr_context) {
+//	if(count4 == 0x2)
+//	{
+//	flag4 = flag4 | 0x1;
+//	}else{
+//		count4++;
+//	}
+//	//clear interrupt
+//	write_clr_irq(SHA_4_BASE);
+//}
+//
+//unsigned int* sha2_block_header(unsigned int block_header[], int MEM_BASE, int SHA_BASE ){
+//	unsigned int* final_digest;
+//
+//	int NumberOfBlock = 0x0;
+//	unsigned int* hash_digest_1;
+//	/*--------padding--------*/
+//	NumberOfBlock = Padding_Mem(MEM_BASE, block_header, 0x50);
+//				/*show block*/
+//				printf("Block of first hash:");
+//				for (index = 0; index <32; index++) {
+//					if ((index % SHA_BLOCK_SIZE && index!=0) == 0)
+//						printf("\n");
+//					printf("%.2x", *(memory_ptr + index));
+//				}
+//				printf("\n");
+//			    /*--------Start first hash--------*/
+//
+//			    /*--------init SHA core--------*/
+//				SHA_Init(SHA_BASE, MEM_BASE,
+//				CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+//
+//				SHA_Init(SHA_BASE, MEM_BASE + SHA_BLOCK_SIZE * 4 ,
+//				CTRL_NEXT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+//
+//				read_digest(SHA_BASE, MEM_BASE);
+//
+//			    /*--------Show digest for first hash--------*/
+//				printf("Digest_first_hash = 0x");
+//				for (index = 0; index < 8; index++) {
+//
+//					printf("%x", *(memory_ptr + index) );
+//				}
+//				printf("\n");
+//
+//				hash_digest_1 = convert_to_byte(MEM_BASE);
+//
+//			    /*--------Start second hash--------*/
+//
+//				NumberOfBlock = Padding_Mem(MEM_BASE, hash_digest_1, 0x20); //32byte
+//				   /*show block*/
+//				printf("Block of second hash:");
+//				for (index = 0; index < 16; index++) {
+//					if ((index % SHA_BLOCK_SIZE) == 0)
+//						printf("\n");
+//						printf("%.2x", *(memory_ptr + index));
+//					}
+//				printf("\n");
+//
+//			    /*--------init SHA core--------*/
+//				SHA_Init(SHA_BASE, MEM_BASE,
+//				CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+//				read_digest(SHA_BASE, MEM_BASE);
+//
+//				printf("Digest_second_hash = 0x");
+//				for (index = 0; index < 8; index++) {
+//					printf("%x", *(memory_ptr + index) );
+//				}
+//				printf("\n");
+//
+//				//reverse byte
+//
+//				final_digest = reverse_byte(MEM_BASE);
+//
+//				printf("Final_digest = 0x");
+//					for (index = 0; index < 32; index++) {
+//						printf("%.2x",final_digest[index] );
+//					}
+//					printf("\n");
+//	return final_digest;
+//}
+//
+//
+//int main() {
+//	unsigned int block_header[80] = {0x00, 0x20, 0x90, 0x20, 0x95, 0x40, 0xd4, 0xbb, 0xb6, 0x51, 0x2d, 0x25, 0x72, 0x36, 0xf1, 0xa6, 0x81, 0x76, 0xc8, 0x1a, 0x2a, 0x94, 0x95, 0xe0, 0x25, 0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4e, 0x02, 0x85, 0xb5, 0x9d, 0x7c, 0x57, 0x26, 0x37, 0xd9, 0xfe, 0x92, 0x8d, 0x31, 0xdb, 0xa2, 0x37, 0xbe, 0xe2, 0xe1, 0xb0, 0x3e, 0x53, 0xcf, 0x02, 0x83, 0xac, 0xd2, 0x7e, 0xde, 0x72, 0xab, 0x4b, 0xfa, 0x38, 0x64, 0xb2, 0xe0, 0x05, 0x17, 0x48, 0x59, 0xc1, 0xe5};
+//	int length = 0x0;
+//	unsigned int target[32] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0xe0, 0xb2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+//	unsigned int nounce0 = 0x0;
+//	unsigned int nounce1 = 0xa;
+//	unsigned int nounce2 = 0x14;
+//	unsigned int nounce3 = 0x1E;
+//	unsigned int nounce4 = 0x28;
+//	unsigned int* final_digest0;
+//	unsigned int* final_digest1;
+//	unsigned int* final_digest2;
+//	unsigned int* final_digest3;
+//	unsigned int* final_digest4;
+//	alt_putstr("Hello from Nios II!\n");
+//
+//	/*--------register irq with handeler--------*/
+//	alt_ic_isr_register(SHA_0_IRQ_INTERRUPT_CONTROLLER_ID, SHA_0_IRQ,
+//			SHA_0_IRQ_Handler, (void*) 0, (void*) 0);
+//	alt_ic_isr_register(SHA_1_IRQ_INTERRUPT_CONTROLLER_ID, SHA_1_IRQ,
+//			SHA_1_IRQ_Handler, (void*) 0, (void*) 0);
+//	alt_ic_isr_register(SHA_2_IRQ_INTERRUPT_CONTROLLER_ID, SHA_2_IRQ,
+//			SHA_2_IRQ_Handler, (void*) 0, (void*) 0);
+//	alt_ic_isr_register(SHA_3_IRQ_INTERRUPT_CONTROLLER_ID, SHA_3_IRQ,
+//			SHA_3_IRQ_Handler, (void*) 0, (void*) 0);
+//	alt_ic_isr_register(SHA_4_IRQ_INTERRUPT_CONTROLLER_ID, SHA_4_IRQ,
+//			SHA_4_IRQ_Handler, (void*) 0, (void*) 0);
+//
+//	for(i = 0x0; i <= 0x9; i++){
+//		printf("\nLOOP INDEX: %x\n", i);
+//		for(index = 76; index < 80 ; index++){
+//			block_header[index] = nounce0 >> ((3 - index - 76) * 8) & 0xFF;
+//		}
+//		final_digest0 = sha2_block_header(block_header, ONCHIP_MEMORY2_1_BASE, SHA_0_BASE);
+//
+//		for(index = 76; index < 80 ; index++){
+//			block_header[index] = nounce1 >> ((3 - index - 76) * 8) & 0xFF;
+//		}
+//		final_digest1 = sha2_block_header(block_header, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 2 * 4 , SHA_1_BASE);
+//
+//		for(index = 76; index < 80 ; index++){
+//			block_header[index] = nounce2 >> ((3 - index - 76) * 8) & 0xFF;
+//		}
+//		final_digest2 = sha2_block_header(block_header, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 4 * 4 , SHA_2_BASE);
+//
+//		for(index = 76; index < 80 ; index++){
+//			block_header[index] = nounce3 >> ((3 - index - 76) * 8) & 0xFF;
+//		}
+//		final_digest3 = sha2_block_header(block_header, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 6 * 4 , SHA_3_BASE);
+//
+//		for(index = 76; index < 80 ; index++){
+//			block_header[index] = nounce4 >> ((3 - index - 76) * 8) & 0xFF;
+//		}
+//		final_digest4 = sha2_block_header(block_header, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 8 * 4 , SHA_4_BASE);
+//	}
+//
+//	while(1){
+//		if ((flag0 & 0x1) == 1) {
+//			if(compareArrays(final_digest0,target,0x20)){
+//						printf("\nCORE: SHA_0\n ");
+//						printf("\nSUCCESS\nDigest Valid\n ");
+//						printf("Nounce = %x \n",nounce0);
+//						break;
+//			}else {
+//						printf("\nCORE: SHA_0\n ");
+//						printf("Digest invalid!!!\n\n");
+//						nounce0++;
+//			}
+//			flag0 = 0x0;
+//		}
+//		if ((flag1 & 0x1) == 1) {
+//						if(compareArrays(final_digest1,target,0x20)){
+//						printf("\nCORE: SHA_1\n ");
+//						printf("\nSUCCESS\nDigest Valid\n ");
+//						printf("Nounce = %x \n",nounce1);
+//						break;
+//			}else {
+//						printf("\nCORE: SHA_1\n ");
+//						printf("Digest invalid!!!\n\n");
+//						nounce1++;
+//			}
+//			flag1 = 0x0;
+//		}
+//		if ((flag2 & 0x1) == 1) {
+//						if(compareArrays(final_digest2,target,0x20)){
+//						printf("\nCORE: SHA_2\n ");
+//						printf("\nSUCCESS\nDigest Valid\n ");
+//						printf("Nounce = %x \n",nounce2);
+//						break;
+//			}else {
+//						printf("\nCORE: SHA_2\n ");
+//						printf("Digest invalid!!!\n\n");
+//						nounce2++;
+//			}
+//			flag2 = 0x0;
+//		}
+//		if ((flag3 & 0x1) == 1) {
+//						if(compareArrays(final_digest3,target,0x20)){
+//						printf("\nCORE: SHA_3\n ");
+//						printf("\nSUCCESS\nDigest Valid\n ");
+//						printf("Nounce = %x \n",nounce3);
+//						break;
+//			}else {
+//						printf("\nCORE: SHA_3\n ");
+//						printf("Digest invalid!!!\n\n");
+//						nounce3++;
+//			}
+//			flag3 = 0x0;
+//		}
+//		if ((flag4 & 0x1) == 1) {
+//						if(compareArrays(final_digest4,target,0x20)){
+//						printf("\nCORE: SHA_4\n ");
+//						printf("\nSUCCESS\nDigest Valid\n ");
+//						printf("Nounce = %x \n",nounce4);
+//						break;
+//			}else {
+//						printf("\nCORE: SHA_4\n ");
+//						printf("Digest invalid!!!\n\n");
+//						nounce4++;
+//			}
+//			flag4 = 0x0;
+//		}
+//
+//	}
+//	return 0;
+//}

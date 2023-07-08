@@ -1,0 +1,64 @@
+
+#ifndef SHA_H_
+#define SHA_H_
+
+#include "alt_types.h"  // alt_u32
+
+#define ADDR_CTRL         0x08
+#define CTRL_INIT_VALUE   0x01
+#define CTRL_NEXT_VALUE   0x02
+#define CTRL_MODE_VALUE   0x04
+#define CTRL_IRQ_EN_VALUE 0x08
+
+#define ADDR_STATUS       0x09
+#define STATUS_READY_BIT  0x0
+#define STATUS_VALID_BIT  0x1
+
+#define ADDR_BLOCK_START  0x10
+#define ADDR_DIGEST_START 0x20
+
+#define ADDR_IRQ_CLR      0x28
+#define IRQ_CLR           0x01
+
+#define SHA224_MODE        0
+#define SHA256_MODE        1
+
+#define SHA_BLOCK_SIZE     16
+#define BLOCK_HEADER_SIZE   32
+#define STORAGE_SIZE     	48
+
+void write_word (int *btr, int addr, int value);
+
+void write_ctrl(int SHA_BASE, int value);
+
+void write_block(int SHA_BASE, int MEM_BASE);
+
+void write_clr_irq(int SHA_BASE);
+
+unsigned int read_control(int SHA_BASE);
+
+unsigned int read_word (int *btr, int addr);
+
+unsigned int read_status(int SHA_BASE);
+
+unsigned int read_block(int SHA_BASE, char index);
+
+void read_digest (int SHA_BASE, int MEM_BASE);
+
+int getLength(char Message[]);
+
+int Padding(unsigned int Block[], char Message[], int l);
+
+void storeTargetIntoMemory(int MEM_BASE, unsigned int Target[], int length);
+
+int Padding_Mem(int MEM_BASE, unsigned int Message[], int length);
+
+unsigned int SHA_Init(int SHA_BASE, int MEM_BASE, int ctrl_value);
+
+unsigned int* convert_to_byte(int MEM_BASE);
+
+unsigned int* reverse_byte(int MEM_BASE);
+
+unsigned int compareArrays(unsigned int* final_digest, unsigned int* target, int size);
+
+#endif /* SHA_H_ */

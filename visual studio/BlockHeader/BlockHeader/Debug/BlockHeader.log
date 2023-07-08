@@ -1,0 +1,7 @@
+﻿  BlockHeader.cpp
+d:\kltn\visual studio\blockheader\blockheader\blockheader.cpp(13): error C4996: 'SHA256_Init': Since OpenSSL 3.0
+  d:\kltn\openssl_out\dll\x64\release\include\openssl\sha.h(73): note: see declaration of 'SHA256_Init'
+d:\kltn\visual studio\blockheader\blockheader\blockheader.cpp(14): error C4996: 'SHA256_Update': Since OpenSSL 3.0
+  d:\kltn\openssl_out\dll\x64\release\include\openssl\sha.h(74): note: see declaration of 'SHA256_Update'
+d:\kltn\visual studio\blockheader\blockheader\blockheader.cpp(15): error C4996: 'SHA256_Final': Since OpenSSL 3.0
+  d:\kltn\openssl_out\dll\x64\release\include\openssl\sha.h(76): note: see declaration of 'SHA256_Final'

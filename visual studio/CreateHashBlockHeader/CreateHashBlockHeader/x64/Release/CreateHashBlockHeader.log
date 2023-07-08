@@ -1,0 +1,20 @@
+﻿  CreateHashBlockHeader.cpp
+d:\my_data\kltn\visual studio\createhashblockheader\createhashblockheader\createhashblockheader.cpp(58): warning C4996: 'SHA256_Init': Since OpenSSL 3.0
+  d:\my_data\kltn\openssl_out\lib\x64\release\include\openssl\sha.h(73): note: see declaration of 'SHA256_Init'
+d:\my_data\kltn\visual studio\createhashblockheader\createhashblockheader\createhashblockheader.cpp(61): warning C4996: 'SHA256_Update': Since OpenSSL 3.0
+  d:\my_data\kltn\openssl_out\lib\x64\release\include\openssl\sha.h(74): note: see declaration of 'SHA256_Update'
+d:\my_data\kltn\visual studio\createhashblockheader\createhashblockheader\createhashblockheader.cpp(67): warning C4996: 'SHA256_Final': Since OpenSSL 3.0
+  d:\my_data\kltn\openssl_out\lib\x64\release\include\openssl\sha.h(76): note: see declaration of 'SHA256_Final'
+d:\my_data\kltn\visual studio\createhashblockheader\createhashblockheader\createhashblockheader.cpp(70): warning C4996: 'SHA256_Init': Since OpenSSL 3.0
+  d:\my_data\kltn\openssl_out\lib\x64\release\include\openssl\sha.h(73): note: see declaration of 'SHA256_Init'
+d:\my_data\kltn\visual studio\createhashblockheader\createhashblockheader\createhashblockheader.cpp(71): warning C4996: 'SHA256_Update': Since OpenSSL 3.0
+  d:\my_data\kltn\openssl_out\lib\x64\release\include\openssl\sha.h(74): note: see declaration of 'SHA256_Update'
+d:\my_data\kltn\visual studio\createhashblockheader\createhashblockheader\createhashblockheader.cpp(77): warning C4996: 'SHA256_Final': Since OpenSSL 3.0
+  d:\my_data\kltn\openssl_out\lib\x64\release\include\openssl\sha.h(76): note: see declaration of 'SHA256_Final'
+d:\my_data\kltn\visual studio\createhashblockheader\createhashblockheader\createhashblockheader.cpp(153): warning C4244: 'initializing': conversion from 'time_t' to 'uint32_t', possible loss of data
+  Generating code
+  1 of 228 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  CreateHashBlockHeader.vcxproj -> D:\My_Data\KLTN\visual studio\CreateHashBlockHeader\x64\Release\CreateHashBlockHeader.exe

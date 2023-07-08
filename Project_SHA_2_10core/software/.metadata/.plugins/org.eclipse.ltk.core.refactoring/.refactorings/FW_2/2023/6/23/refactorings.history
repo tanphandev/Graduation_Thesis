@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;FW_2/test_sha2_3.c&apos; to &apos;mining_block_header.c&apos;" description="Rename resource &apos;test_sha2_3.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="test_sha2_3.c" name="mining_block_header.c" stamp="1686221644941" updateReferences="true"/>
+</session>

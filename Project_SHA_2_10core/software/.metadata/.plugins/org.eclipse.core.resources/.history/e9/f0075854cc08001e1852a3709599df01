@@ -1,0 +1,196 @@
+///*
+//* "Small Hello World" example.
+//*
+//* This example prints 'Hello from Nios II' to the STDOUT stream. It runs on
+//* the Nios II 'standard', 'full_featured', 'fast', and 'low_cost' example
+//* designs. It requires a STDOUT  device in your system's hardware.
+//*
+//* The purpose of this example is to demonstrate the smallest possible Hello
+//* World application, using the Nios II HAL library.  The memory footprint
+//* of this hosted application is ~332 bytes by default using the standard
+//* reference design.  For a more fully featured Hello World application
+//* example, see the example titled "Hello World".
+//*
+//* The memory footprint of this example has been reduced by making the
+//* following changes to the normal "Hello World" example.
+//* Check in the Nios II Software Developers Manual for a more complete
+//* description.
+//*
+//* In the SW Application project (small_hello_world):
+//*
+//*  - In the C/C++ Build page
+//*
+//*    - Set the Optimization Level to -Os
+//*
+//* In System Library project (small_hello_world_syslib):
+//*  - In the C/C++ Build page
+//*
+//*    - Set the Optimization Level to -Os
+//*
+//*    - Define the preprocessor option ALT_NO_INSTRUCTION_EMULATION
+//*      This removes software exception handling, which means that you cannot
+//*      run code compiled for Nios II cpu with a hardware multiplier on a core
+//*      without a the multiply unit. Check the Nios II Software Developers
+//*      Manual for more details.
+//*
+//*  - In the System Library page:
+//*    - Set Periodic system timer and Timestamp timer to none
+//*      This prevents the automatic inclusion of the timer driver.
+//*
+//*    - Set Max file descriptors to 4
+//*      This reduces the size of the file handle pool.
+//*
+//*    - Check Main function does not exit
+//*    - Uncheck Clean exit (flush buffers)
+//*      This removes the unneeded call to exit when main returns, since it
+//*      won't.
+//*
+//*    - Check Don't use C++
+//*      This builds without the C++ support code.
+//*
+//*    - Check Small C library
+//*      This uses a reduced functionality C library, which lacks
+//*      support for buffering, file IO, floating point and getch(), etc.
+//*      Check the Nios II Software Developers Manual for a complete list.
+//*
+//*    - Check Reduced device drivers
+//*      This uses reduced functionality drivers if they're available. For the
+//*      standard design this means you get polled UART and JTAG UART drivers,
+//*      no support for the LCD driver and you lose the ability to program
+//*      CFI compliant flash devices.
+//*
+//*    - Check Access device drivers directly
+//*      This bypasses the device file system to access device drivers directly.
+//*      This eliminates the space required for the device file system services.
+//*      It also provides a HAL version of libc services that access the drivers
+//*      directly, further reducing space. Only a limited number of libc
+//*      functions are available in this configuration.
+//*
+//*    - Use ALT versions of stdio routines:
+//*
+//*           Function                  Description
+//*        ===============  =====================================
+//*        alt_printf       Only supports %s, %x, and %c ( < 1 Kbyte)
+//*        alt_putstr       Smaller overhead than puts with direct drivers
+//*                         Note this function doesn't add a newline.
+//*        alt_putchar      Smaller overhead than putchar with direct drivers
+//*        alt_getchar      Smaller overhead than getchar with direct drivers
+//*
+//*/
+//
+//#include "sys/alt_stdio.h"
+//#include "system.h"
+//#include "sys/alt_irq.h"
+//#include "SHA.h"
+//
+//volatile alt_u32 *memory_ptr = (alt_u32*) ONCHIP_MEMORY2_1_BASE;
+//
+//volatile alt_u32 index = 0;
+//unsigned int flag0 = 0x0;
+//unsigned int flag1 = 0x0;
+//unsigned int flag2 = 0x0;
+//unsigned int flag3 = 0x0;
+//unsigned int flag4 = 0x0;
+//
+//void SHA_0_IRQ_Handler(void* isr_context) {
+//	flag = flag | 0x1;
+//	//clear interrupt
+//	write_clr_irq(SHA_0_BASE);
+//	/*--------init SHA core--------*/
+//	SHA_Init(SHA_1_BASE, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 4,
+//	CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+//}
+//
+//void SHA_1_IRQ_Handler(void* isr_context) {
+//	flag = flag | 0x2;
+//	//clear interrupt
+//	write_clr_irq(SHA_1_BASE);
+//	/*--------init SHA core--------*/
+//	SHA_Init(SHA_2_BASE, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 8,
+//		CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+//}
+//
+//void SHA_2_IRQ_Handler(void* isr_context) {
+//	flag = flag | 0x4;
+//	//clear interrupt
+//	write_clr_irq(SHA_2_BASE);
+//}
+//
+//int main() {
+//
+//	char message_0[80] = "tanphandev\n";
+//	char message_1[80] = "helloword\n";
+//	char message_2[80] = "testshairq\n";
+//	int length = 0x0;
+//	int NumberOfBlock = 0x0;
+//	unsigned int block[16] = { 0x0 };
+//	unsigned int digest[8] = { 0x0 };
+//
+//	alt_putstr("Hello from Nios II!\n");
+//	/*--------register irq with handeler--------*/
+//	alt_ic_isr_register(SHA_0_IRQ_INTERRUPT_CONTROLLER_ID, SHA_0_IRQ,
+//			SHA_0_IRQ_Handler, (void*) 0, (void*) 0);
+//	alt_ic_isr_register(SHA_1_IRQ_INTERRUPT_CONTROLLER_ID, SHA_1_IRQ,
+//			SHA_1_IRQ_Handler, (void*) 0, (void*) 0);
+//	alt_ic_isr_register(SHA_2_IRQ_INTERRUPT_CONTROLLER_ID, SHA_2_IRQ,
+//			SHA_2_IRQ_Handler, (void*) 0, (void*) 0);
+//  /*--------padding--------*/
+//	length = getLength(message_0);
+//	NumberOfBlock = Padding_Mem(ONCHIP_MEMORY2_1_BASE, message_0, length);
+//
+//	length = getLength(message_1);
+//	NumberOfBlock = Padding_Mem(ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 4,
+//			message_1, length);
+//
+//	length = getLength(message_2);
+//	NumberOfBlock = Padding_Mem(ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 8,
+//			message_2, length);
+//  /*show block*/
+//	for (index = 0; index < 3 * 16; index++) {
+//		if ((index % SHA_BLOCK_SIZE) == 0)
+//			printf("\n");
+//		printf("%.4x", *(memory_ptr + index));
+//	}
+//
+//	printf("\n");
+//   /*--------init SHA core--------*/
+//	SHA_Init(SHA_0_BASE, ONCHIP_MEMORY2_1_BASE,
+//	CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+//
+//	printf("control = %.4x\n", read_control(SHA_2_BASE));
+//
+//	while (1) {
+//		if ((flag & 0x1) == 1) {
+//			printf("flag = %4x\n", flag);
+//			read_digest(SHA_0_BASE, ONCHIP_MEMORY2_1_BASE);
+//			printf("Hash digest = 0x");
+//			for (index = 0; index < 8; index++) {
+//				printf("%08x", *(memory_ptr + index));
+//			}
+//			printf("\n");
+//			flag = flag & 0b11111110;
+//		}
+//		if ((flag & 0x2) == 0x2) {
+//			printf("flag = %4x\n", flag);
+//			read_digest(SHA_1_BASE, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 4);
+//			printf("Hash digest = 0x");
+//			for (index = 0; index < 8; index++) {
+//				printf("%08x", *(memory_ptr + index + 16));
+//			}
+//			printf("\n");
+//			flag = flag & 0b11111101;
+//		}
+//		if ((flag & 0x4) == 0x4) {
+//			printf("flag = %4x\n", flag);
+//			read_digest(SHA_2_BASE, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 8);
+//			printf("Hash digest = 0x");
+//			for (index = 0; index < 8; index++) {
+//				printf("%08x", *(memory_ptr + index + 32));
+//			}
+//			printf("\n");
+//			flag = flag & 0b11111011;
+//		}
+//	}
+//
+//	return 0;
+//}

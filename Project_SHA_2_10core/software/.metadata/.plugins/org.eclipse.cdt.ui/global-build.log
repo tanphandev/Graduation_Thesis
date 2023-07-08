@@ -1,0 +1,89 @@
+15:53:27 **** Incremental Build of configuration Nios II for project FW_2 ****
+make all 
+Info: Building ../FW_2_bsp/
+C:/intelFPGA_lite/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../FW_2_bsp/
+[BSP build complete]
+Info: Compiling optimize_mining_4.c to obj/default/optimize_mining_4.o
+nios2-elf-gcc -xc -MP -MMD -c -I../FW_2_bsp//HAL/inc -I../FW_2_bsp/ -I../FW_2_bsp//drivers/inc  -pipe -D__hal__ -DALT_NO_C_PLUS_PLUS -DALT_NO_CLEAN_EXIT -D'exit(a)=_exit(a)' -DALT_NO_EXIT -DALT_USE_DIRECT_DRIVERS -DALT_NO_INSTRUCTION_EMULATION -DALT_USE_SMALL_DRIVERS -DSMALL_C_LIB -DALT_SINGLE_THREADED    -Os -g -Wall   -mno-hw-div -mno-hw-mul -mno-hw-mulx -mgpopt=global  -o obj/default/optimize_mining_4.o optimize_mining_4.c
+optimize_mining_4.c:18:18: warning: built-in function 'index' declared as non-function
+ volatile alt_u32 index = 0;
+                  ^
+optimize_mining_4.c: In function 'SHA_0_IRQ_Handler':
+optimize_mining_4.c:73:3: warning: implicit declaration of function 'padding_for_first_hash' [-Wimplicit-function-declaration]
+   padding_for_first_hash(ONCHIP_MEMORY2_1_BASE + BLOCK_HEADER_SIZE *4);
+   ^
+optimize_mining_4.c: In function 'init_block_header':
+optimize_mining_4.c:300:6: warning: variable 'NumberOfBlock' set but not used [-Wunused-but-set-variable]
+  int NumberOfBlock = 0x0;
+      ^
+optimize_mining_4.c: In function 'main':
+optimize_mining_4.c:447:3: warning: implicit declaration of function 'printf' [-Wimplicit-function-declaration]
+   printf("Start Mining...\n");
+   ^
+optimize_mining_4.c:447:3: warning: incompatible implicit declaration of built-in function 'printf'
+optimize_mining_4.c:447:3: note: include '<stdio.h>' or provide a declaration of 'printf'
+optimize_mining_4.c:452:4: warning: implicit declaration of function 'reverse_byte_in_memory' [-Wimplicit-function-declaration]
+    reverse_byte_in_memory(ONCHIP_MEMORY2_1_BASE + BLOCK_HEADER_SIZE * 4, 0x8);
+    ^
+optimize_mining_4.c:453:7: warning: implicit declaration of function 'compareWithTarget' [-Wimplicit-function-declaration]
+    if(compareWithTarget(ONCHIP_MEMORY2_1_BASE + BLOCK_HEADER_SIZE * 4, ONCHIP_MEMORY2_1_BASE + STORAGE_SIZE * 12 * 4, 0x8)){
+       ^
+optimize_mining_4.c:459:15: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+        printf("%.8x",*(memory_ptr + 32 + (7 - index)));
+               ^
+optimize_mining_4.c:483:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base1 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:507:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base2 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:531:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base3 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:555:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base4 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:579:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base5 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:603:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base6 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:627:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base7 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:651:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base8 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:675:13: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'alt_u32 {aka volatile long unsigned int}' [-Wformat=]
+      printf("%.8x",*(mem_base9 + 32 + (7 - index)));
+             ^
+optimize_mining_4.c:312:15: warning: unused variable 'limitedLoop' [-Wunused-variable]
+  unsigned int limitedLoop = 0xa;
+               ^
+optimize_mining_4.c:311:15: warning: unused variable 'limited' [-Wunused-variable]
+  unsigned int limited = 0x1;
+               ^
+optimize_mining_4.c:307:6: warning: unused variable 'length' [-Wunused-variable]
+  int length = 0x0;
+      ^
+Info: Linking FW_2.elf
+nios2-elf-g++  -T'../FW_2_bsp//linker.x' -msys-crt0='../FW_2_bsp//obj/HAL/src/crt0.o' -msys-lib=hal_bsp -L../FW_2_bsp/  -msmallc  -Wl,-Map=FW_2.map   -Os -g -Wall   -mno-hw-div -mno-hw-mul -mno-hw-mulx -mgpopt=global  -o FW_2.elf obj/default/SHA.o obj/default/optimize.o obj/default/optimize_mining.o obj/default/optimize_mining_2.o obj/default/optimize_mining_3.o obj/default/optimize_mining_4.o obj/default/refactor.o obj/default/test_10_core_sha.o obj/default/test_mining.o obj/default/test_mining_10core.o -lm -msys-lib=m
+nios2-elf-insert FW_2.elf --thread_model hal --cpu_name nios2_gen2_0 --qsys true --simulation_enabled false --stderr_dev jtag_uart_0 --stdin_dev jtag_uart_0 --stdout_dev jtag_uart_0 --sopc_system_name system --quartus_project_dir "D:/My_Data/KLTN/test/Project_SHA_2_10core" --jdi ../..//output_files/Asic_Miner.jdi --sopcinfo D:/My_Data/KLTN/test/Project_SHA_2_10core/software/FW_2_bsp/../../system.sopcinfo
+Info: (FW_2.elf) 11 KBytes program size (code + initialized data).
+Info:            237 KBytes free for stack + heap.
+Info: Creating FW_2.objdump
+nios2-elf-objdump --disassemble --syms --all-header --source FW_2.elf >FW_2.objdump
+[FW_2 build complete]
+15:53:31 **** Build of configuration Nios II for project FW_2 ****
+make all 
+Info: Building ../FW_2_bsp/
+C:/intelFPGA_lite/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../FW_2_bsp/
+[BSP build complete]
+[FW_2 build complete]
+15:53:32 **** Incremental Build of configuration Nios II for project FW_2 ****
+make all 
+Info: Building ../FW_2_bsp/
+C:/intelFPGA_lite/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../FW_2_bsp/
+[BSP build complete]
+[FW_2 build complete]

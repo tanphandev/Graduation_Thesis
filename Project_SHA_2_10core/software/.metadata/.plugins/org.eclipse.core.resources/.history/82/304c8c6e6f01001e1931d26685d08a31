@@ -1,0 +1,323 @@
+/* 
+ * "Small Hello World" example. 
+ * 
+ * This example prints 'Hello from Nios II' to the STDOUT stream. It runs on
+ * the Nios II 'standard', 'full_featured', 'fast', and 'low_cost' example 
+ * designs. It requires a STDOUT  device in your system's hardware. 
+ *
+ * The purpose of this example is to demonstrate the smallest possible Hello 
+ * World application, using the Nios II HAL library.  The memory footprint
+ * of this hosted application is ~332 bytes by default using the standard 
+ * reference design.  For a more fully featured Hello World application
+ * example, see the example titled "Hello World".
+ *
+ * The memory footprint of this example has been reduced by making the
+ * following changes to the normal "Hello World" example.
+ * Check in the Nios II Software Developers Manual for a more complete 
+ * description.
+ * 
+ * In the SW Application project (small_hello_world):
+ *
+ *  - In the C/C++ Build page
+ * 
+ *    - Set the Optimization Level to -Os
+ * 
+ * In System Library project (small_hello_world_syslib):
+ *  - In the C/C++ Build page
+ * 
+ *    - Set the Optimization Level to -Os
+ * 
+ *    - Define the preprocessor option ALT_NO_INSTRUCTION_EMULATION 
+ *      This removes software exception handling, which means that you cannot 
+ *      run code compiled for Nios II cpu with a hardware multiplier on a core 
+ *      without a the multiply unit. Check the Nios II Software Developers 
+ *      Manual for more details.
+ *
+ *  - In the System Library page:
+ *    - Set Periodic system timer and Timestamp timer to none
+ *      This prevents the automatic inclusion of the timer driver.
+ *
+ *    - Set Max file descriptors to 4
+ *      This reduces the size of the file handle pool.
+ *
+ *    - Check Main function does not exit
+ *    - Uncheck Clean exit (flush buffers)
+ *      This removes the unneeded call to exit when main returns, since it
+ *      won't.
+ *
+ *    - Check Don't use C++
+ *      This builds without the C++ support code.
+ *
+ *    - Check Small C library
+ *      This uses a reduced functionality C library, which lacks  
+ *      support for buffering, file IO, floating point and getch(), etc. 
+ *      Check the Nios II Software Developers Manual for a complete list.
+ *
+ *    - Check Reduced device drivers
+ *      This uses reduced functionality drivers if they're available. For the
+ *      standard design this means you get polled UART and JTAG UART drivers,
+ *      no support for the LCD driver and you lose the ability to program 
+ *      CFI compliant flash devices.
+ *
+ *    - Check Access device drivers directly
+ *      This bypasses the device file system to access device drivers directly.
+ *      This eliminates the space required for the device file system services.
+ *      It also provides a HAL version of libc services that access the drivers
+ *      directly, further reducing space. Only a limited number of libc
+ *      functions are available in this configuration.
+ *
+ *    - Use ALT versions of stdio routines:
+ *
+ *           Function                  Description
+ *        ===============  =====================================
+ *        alt_printf       Only supports %s, %x, and %c ( < 1 Kbyte)
+ *        alt_putstr       Smaller overhead than puts with direct drivers
+ *                         Note this function doesn't add a newline.
+ *        alt_putchar      Smaller overhead than putchar with direct drivers
+ *        alt_getchar      Smaller overhead than getchar with direct drivers
+ *
+ */
+
+#include "sys/alt_stdio.h"
+#include "altera_avalon_timer_regs.h"
+#include "system.h"
+#include "stdio.h"
+#include "sys/alt_irq.h"
+
+volatile int *sha_ptr = (int*) SHA_2_0_BASE;
+int index = 0;
+unsigned int counter = 0;
+
+int getLength(char Message[]) {
+	int length;
+	length = 0;
+	while (1) {
+		if (Message[length] != '\n')
+			length++;
+		else
+			break;
+	}
+	return length;
+}
+
+int Padding(unsigned int Block[], char Message[], int l) {
+	int i, j, count, NumberBlock;
+	unsigned int temp;
+
+	j = 0;
+	count = 0;
+	temp = 0;
+	Block[j] = 0;
+
+	for (i = 0; i < l; i++) {
+		temp = Message[i];
+		if (count < 3) {
+			temp = temp << (3 - count) * 8;
+		}
+		Block[j] = Block[j] | temp;
+		count++;
+		if (count == 4) {
+			j++;
+			Block[j] = 0;
+			temp = 0;
+			count = 0;
+		}
+	}
+	if ((l % 4) == 0) {
+		Block[l / 4] = 0x80 << 24;
+	} else {
+		j = l / 4;
+		i = l % 4;
+		if (i < 4) {
+			temp = 0x80 << (3 - i) * 8;
+		} else {
+			temp = 0x80;
+		}
+		Block[j] = Block[j] | temp;
+
+	}
+
+	if (l <= 55) {
+		for (i = j + 1; i < 15; i++) {
+			Block[i] = 0;
+			NumberBlock = 1;
+		}
+	} else if (l >= 56 && l <= 119) {
+		for (i = j + 1; i < 31; i++) {
+			Block[i] = 0;
+			NumberBlock = 2;
+		}
+	} else if (l >= 120 && l <= 183) {
+		for (i = j + 1; i < 47; i++) {
+			Block[i] = 0;
+			NumberBlock = 3;
+		}
+	} else if (l >= 184 && l <= 247) {
+		for (i = j + 1; i < 63; i++) {
+			Block[i] = 0;
+			NumberBlock = 4;
+		}
+	} else if (l >= 248 && l <= 311) {
+		for (i = j + 1; i < 79; i++) {
+			Block[i] = 0;
+			NumberBlock = 5;
+		}
+	} else if (l >= 312 && l <= 375) {
+		for (i = j + 1; i < 95; i++) {
+			Block[i] = 0;
+			NumberBlock = 6;
+		}
+	} else if (l >= 376 && l <= 439) {
+		for (i = j + 1; i < 111; i++) {
+			Block[i] = 0;
+			NumberBlock = 7;
+		}
+	} else if (l >= 440 && l <= 503) {
+		for (i = j + 1; i < 127; i++) {
+			Block[i] = 0;
+			NumberBlock = 8;
+		}
+	} else if (l >= 504 && l <= 567) {
+		for (i = j + 1; i < 143; i++) {
+			Block[i] = 0;
+			NumberBlock = 9;
+		}
+	} else if (l >= 568 && l <= 631) {
+		for (i = j + 1; i < 159; i++) {
+			Block[i] = 0;
+			NumberBlock = 10;
+		}
+	} else if (l >= 632 && l <= 695) {
+		for (i = j + 1; i < 175; i++) {
+			Block[i] = 0;
+			NumberBlock = 11;
+		}
+	} else if (l >= 696 && l <= 759) {
+		for (i = j + 1; i < 191; i++) {
+			Block[i] = 0;
+			NumberBlock = 12;
+		}
+	} else if (l >= 760 && l <= 823) {
+		for (i = j + 1; i < 207; i++) {
+			Block[i] = 0;
+			NumberBlock = 13;
+		}
+	} else if (l >= 824 && l <= 897) {
+		for (i = j + 1; i < 223; i++) {
+			Block[i] = 0;
+			NumberBlock = 14;
+		}
+	} else if (l >= 898 && l <= 951) {
+		for (i = j + 1; i < 239; i++) {
+			Block[i] = 0;
+			NumberBlock = 15;
+		}
+	}
+	Block[i] = l * 8;
+	for (i = i + 1; i < 64; i++) {
+		Block[i] = 0;
+	}
+	return NumberBlock;
+}
+
+void SHA_IRQ_Handler(void* isr_context) {
+	printf("-->done\n");
+	printf("staus = 0x%x\n", *(sha_ptr + 9));
+	//clear interrupt
+	*(sha_ptr + 0x28) = 0b1;
+
+	printf("staus = 0x%x\n", *(sha_ptr + 9));
+
+	//get hash digest
+	printf("Hash digest = ");
+	for (index = 0; index < 8; index++) {
+		printf("%.4x", *(sha_ptr + 0x20 + index));
+	}
+	printf("\n");
+	printf("staus = 0x%x\n", *(sha_ptr + 9));
+}
+
+void SHA_256() {
+	char message[80] = "tanphandev\n";
+	int length = 0x0;
+	int NumberOfBlock = 0x0;
+	unsigned int block[16] = { 0x0 };
+
+	printf("Devie name = 0x%x%x\n", *(sha_ptr), *(sha_ptr + 1));
+	printf("Core version = 0x%x\n", *(sha_ptr + 2));
+	printf("staus = 0x%x\n", *(sha_ptr + 9));
+	//clear interrupt
+	*(sha_ptr + 0x28) = 0b1;
+	printf("staus = 0x%x\n", *(sha_ptr + 9));
+
+	printf("message = %s\n", message);
+	length = getLength(message);
+	printf("lengh of message = %d\n", length);
+	NumberOfBlock = Padding(block, message, length);
+	printf("Number of block = %d\n", NumberOfBlock);
+
+	//start write block
+	printf("Block value = ");
+	for (index = 0; index < 16; index++) {
+		*(sha_ptr + 0x10 + index) = block[index];
+		printf("%.4x", *(sha_ptr + 0x10 + index));
+	}
+	printf("\n");
+
+	//write control
+	*(sha_ptr + 0x8) = 0b1101; //mode = 1, init = 1, irq_en = 1
+	printf("control = 0x%x\n", *(sha_ptr + 8));
+
+	//wait done
+	while (*(sha_ptr + 9) != 7)
+	 ;
+	 printf("staus = 0x%x\n", *(sha_ptr + 9));
+
+	 //get hash digest
+	 printf("Hash digest = ");
+	 for (index = 0; index < 8; index++) {
+	 printf("%.4x", *(sha_ptr + 0x20 + index));
+	 }
+	 printf("\n");
+
+	 //clear interrupt
+	 *(sha_ptr + 0x28) = 0b1;
+	 printf("staus = 0x%x\n", *(sha_ptr + 9));
+}
+
+void timer_Init() {
+	unsigned int period = 0;
+// Stop Timer
+	IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_0_BASE,
+			ALTERA_AVALON_TIMER_CONTROL_STOP_MSK);
+//Configure period
+	period = 50000000 - 1;
+	IOWR_ALTERA_AVALON_TIMER_PERIODL(TIMER_0_BASE, period);
+	IOWR_ALTERA_AVALON_TIMER_PERIODH(TIMER_0_BASE, (period >> 16));
+	IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_0_BASE,
+			ALTERA_AVALON_TIMER_CONTROL_CONT_MSK | // Continue counting mode
+			ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |// Interrupt enable
+			ALTERA_AVALON_TIMER_CONTROL_START_MSK);// Start Timer
+}
+
+void Timer_IRQ_Handler(void* isr_context) {
+	counter++;
+	printf("%d seconds\n", counter);
+// Clear Timer interrupt bit
+	IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_0_BASE,
+			ALTERA_AVALON_TIMER_STATUS_TO_MSK);
+}
+
+int main() {
+	alt_putstr("Hello from Nios II!\n");
+	//timer_Init();
+	/* Event loop never exits. */
+	//alt_ic_isr_register(0, TIMER_0_IRQ, Timer_IRQ_Handler, (void*)0,(void*) 0);
+
+	alt_ic_isr_register(SHA_2_0_IRQ_INTERRUPT_CONTROLLER_ID, SHA_2_0_IRQ, SHA_IRQ_Handler, (void*) 0, (void*) 0);
+	SHA_256();
+	while (1)
+		;
+
+	return 0;
+}

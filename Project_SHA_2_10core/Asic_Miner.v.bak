@@ -1,0 +1,8 @@
+module Asic_Miner (
+	input			CLOCK_50,
+	input	[0:0]		KEY
+);
+
+
+
+endmodule

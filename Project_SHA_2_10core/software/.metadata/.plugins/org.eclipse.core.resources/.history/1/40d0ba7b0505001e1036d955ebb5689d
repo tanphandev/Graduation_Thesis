@@ -1,0 +1,84 @@
+
+#include "sys/alt_stdio.h"
+#include "system.h"
+#include "sys/alt_irq.h"
+#include "SHA.h"
+
+volatile alt_u32 *memory_ptr = (alt_u32*) ONCHIP_MEMORY2_1_BASE;
+
+volatile alt_u32 index = 0;
+unsigned char flag = 0;
+
+void SHA_0_IRQ_Handler(void* isr_context) {
+	flag = flag | 0x1;
+	//clear interrupt
+	write_clr_irq(SHA_0_BASE);
+	/*--------init SHA core--------*/
+	SHA_Init(SHA_1_BASE, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 4,
+	CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+}
+
+void SHA_1_IRQ_Handler(void* isr_context) {
+	flag = flag | 0x2;
+	//clear interrupt
+	write_clr_irq(SHA_1_BASE);
+	/*--------init SHA core--------*/
+	SHA_Init(SHA_2_BASE, ONCHIP_MEMORY2_1_BASE + SHA_BLOCK_SIZE * 8,
+		CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+}
+
+void SHA_2_IRQ_Handler(void* isr_context) {
+	flag = flag | 0x4;
+	//clear interrupt
+	write_clr_irq(SHA_2_BASE);
+}
+
+int main() {
+
+	char message_0[80] = "tanphandev\n";
+	int length = 0x0;
+	int NumberOfBlock = 0x0;
+	unsigned int block[16] = { 0x0 };
+	unsigned int digest[8] = { 0x0 };
+
+	alt_putstr("Hello from Nios II!\n");
+	/*--------register irq with handeler--------*/
+	alt_ic_isr_register(SHA_0_IRQ_INTERRUPT_CONTROLLER_ID, SHA_0_IRQ,
+			SHA_0_IRQ_Handler, (void*) 0, (void*) 0);
+	alt_ic_isr_register(SHA_1_IRQ_INTERRUPT_CONTROLLER_ID, SHA_1_IRQ,
+			SHA_1_IRQ_Handler, (void*) 0, (void*) 0);
+	alt_ic_isr_register(SHA_2_IRQ_INTERRUPT_CONTROLLER_ID, SHA_2_IRQ,
+			SHA_2_IRQ_Handler, (void*) 0, (void*) 0);
+   /*--------padding--------*/
+	length = getLength(message_0);
+	NumberOfBlock = Padding_Mem(ONCHIP_MEMORY2_1_BASE, message_0, length);
+
+   /*show block*/
+	for (index = 0; index < 3 * 16; index++) {
+		if ((index % SHA_BLOCK_SIZE) == 0)
+			printf("\n");
+		printf("%.4x", *(memory_ptr + index));
+	}
+
+	printf("\n");
+    /*--------init SHA core--------*/
+	SHA_Init(SHA_0_BASE, ONCHIP_MEMORY2_1_BASE,
+	CTRL_INIT_VALUE + CTRL_IRQ_EN_VALUE + CTRL_MODE_VALUE); //mode = 1, init = 1, irq_en = 1
+
+	printf("control = %.4x\n", read_control(SHA_2_BASE));
+
+	while (1) {
+		if ((flag & 0x1) == 1) {
+			printf("flag = %4x\n", flag);
+			read_digest(SHA_0_BASE, ONCHIP_MEMORY2_1_BASE);
+			printf("Hash digest = 0x");
+			for (index = 0; index < 8; index++) {
+				printf("%08x", *(memory_ptr + index));
+			}
+			printf("\n");
+			flag = flag & 0b11111110;
+		}
+	}
+
+	return 0;
+}
